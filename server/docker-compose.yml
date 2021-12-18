@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  home_iptv_api:
+    container_name: home_iptv_api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 3020:3020
+    volumes:
+      - /tmp:/tmp
+    environment:
+      - MODE=prod
+      - CLOUDWATCH_REGION=us-west-2
+    networks:
+      - nginx.docker
+    deploy:
+      resources:
+        limits:
+          memory: 4000M
+        reservations:
+          memory: 500M
+
+networks:
+  nginx.docker:
+    name: nginx.docker
+    external: true
+
+volumes:
+  db_data: {}
