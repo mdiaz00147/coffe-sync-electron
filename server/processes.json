@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "merge_logs": true,
+      "name": "worker1",
+      "out_file": "/tmp/workers.log",
+      "log_date_format": "MM/DD/YYYY HH:mm:ss",
+      "script": "index.js"
+    }
+  ]
+}

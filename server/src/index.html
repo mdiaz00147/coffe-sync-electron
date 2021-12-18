@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home IPTV :: Channel</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+
+    <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet" />
+    <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+    <!-- <script src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script> -->
+
+    <script src="./../node_modules/axios/dist/axios.min.js">
+      const axios = require('axios');
+    </script>
+  </head>
+  <body class="bg-dark">
+    <div class="container-fluid">
+      <div class="row m-5">
+        <button class="col-4 btn btn-warning btn-lg" onclick="playVideo()">
+          PLAY
+        </button>
+        <button class="col-4 btn btn-success btn-lg" onclick="fullScreen()">
+          FULL SCREEN
+        </button>
+        <button class="col-4 btn btn-info btn-lg" onclick="refresh()">
+          REFRESH
+        </button>
+      </div>
+
+      <div class="row m-5">
+        <div class="col-8">
+          <video
+            id="my-video"
+            class="video-js"
+            controls
+            preload="auto"
+            width="600px"
+            height="500px"
+            data-setup="{}"
+            autoplay
+          >
+            <source
+              src="http://iptv-server.blackboxcode.io/live/test.flv"
+              type="video/flv"
+            />
+
+            <p class="vjs-no-js">
+              To view this video please enable JavaScript, and consider
+              upgrading to a web browser that
+              <a href="https://videojs.com/html5-video-support/" target="_blank"
+                >supports HTML5 video</a
+              >
+            </p>
+          </video>
+        </div>
+
+        <div class="col-4">
+          <div class="row">
+            <button
+              class="btn btn-block btn-success"
+              onclick="switchChannel(101327)"
+            >
+              CARACOL
+            </button>
+            <button
+              class="btn btn-block btn-success"
+              onclick="switchChannel(101330)"
+            >
+              RCN
+            </button>
+            <button
+              class="btn btn-block btn-success"
+              onclick="switchChannel(341718)"
+            >
+              HBO FAMILY HD
+            </button>
+            <button
+              class="btn btn-block btn-success"
+              onclick="switchChannel(341702)"
+            >
+              HBO LATINO HD
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row m-5">
+        <button class="col-4 btn btn-warning btn-lg" onclick="playVideo()">
+          PLAY
+        </button>
+        <button class="col-4 btn btn-success btn-lg" onclick="fullScreen()">
+          FULL SCREEN
+        </button>
+        <button class="col-4 btn btn-info btn-lg" onclick="refresh()">
+          REFRESH
+        </button>
+      </div>
+
+      <script src="./../node_modules/video.js/dist/video.min.js"></script>
+      <script src="./../node_modules/flv.js/dist/flv.min.js"></script>
+      <script src="./../node_modules/videojs-flvjs/dist/videojs-flvjs.min.js"></script>
+      <script src="./../node_modules/videojs-fetch-flv/dist/videojs-fetch-flv.min.js"></script>
+
+      <script>
+        var player = videojs("my-video");
+        player.fetchFlv();
+
+        function playVideo() {
+          player.play();
+        }
+        function fullScreen() {
+          playVideo();
+          player.requestFullscreen();
+        }
+        function refresh() {
+          location.reload();
+        }
+        function switchChannel(channelID) {
+          var data = JSON.stringify({
+            channelID: channelID,
+            vb: "500k",
+            ab: "100k"
+          });
+          axios({
+            method: "put",
+            url: "https://iptv-api.blackboxcode.io/switch",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            data: data
+          })
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      </script>
+    </div>
+  </body>
+</html>
