@@ -1,5 +1,5 @@
 // controllers
-const walletsController = require("../controllers/channels/switchController");
+const walletsController = require("./../controllers/channels/switchController");
 
 exports.routes = (app) => {
   // V1 routes
