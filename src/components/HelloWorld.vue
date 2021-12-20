@@ -4,7 +4,15 @@
       <v-col cols="12">
         <v-btn color="success" @click="fetchData()"> List Files </v-btn>
       </v-col>
+      <v-col cols="12"> </v-col>
+
       <v-col cols="12">
+        <v-breadcrumbs
+          divider="/"
+          :items="breadItems"
+          class="pl-0"
+        ></v-breadcrumbs>
+
         <v-simple-table>
           <template v-slot:default>
             <thead>
@@ -57,7 +65,16 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ currentPath: "getCurrentPath" })
+    ...mapGetters({ currentPath: "getCurrentPath" }),
+    breadItems() {
+      return this.currentPath.split("/").map((e) => {
+        return {
+          text: e,
+          href: "",
+          disabled: false
+        };
+      });
+    }
   },
   methods: {
     async fetchData() {
