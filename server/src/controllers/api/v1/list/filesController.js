@@ -1,17 +1,27 @@
 const { exec } = require("child_process");
 
 exports.create = async (req, res) => {
-  const fileName = req.body["fileName"];
   const pathName = req.body["path"];
 
-  console.log("DEBUG::", fileName);
-  let command = `rsync -azP root@104.207.133.53:${pathName}/${fileName} /Users/$(whoami)/Downloads`;
+  let command = `ssh root@104.207.133.53 ls -ahl ${pathName}`;
 
   const call = await exec(command);
 
-  call.stdout.once("data", (data) => {
+  call.stdout.once("data", async (data) => {
     console.log(`stdout: ${data}`);
-    return res.status(200).send({ data: data, status: 200 });
+    let result = await data.split("\n").filter((x, i) => i > 2).filter((e) => e);
+    
+    result = result.map((e) => {
+      let arr = e.split(" ").filter((e) => e);
+      console.log("DEGUB::", arr);
+
+      return {
+        name: arr[arr.length - 1],
+        size: arr[4]
+      };
+    });
+
+    return res.status(200).send({ data: result, status: 200 });
   });
 
   call.stderr.once("data", (data) => {

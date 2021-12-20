@@ -4,24 +4,36 @@
       <v-col cols="12">
         <v-btn color="success" @click="fetchData()"> List Files </v-btn>
       </v-col>
+      <v-col cols="12"> </v-col>
+
       <v-col cols="12">
+        <v-breadcrumbs
+          divider="/"
+          :items="breadItems"
+          class="pl-0"
+        ></v-breadcrumbs>
+
         <v-simple-table>
           <template v-slot:default>
             <thead>
               <tr>
                 <th class="text-left">Name</th>
-                <th class="text-left">Calories</th>
+                <th class="text-left">Size</th>
                 <th class="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="item in items" :key="item.name">
                 <td class="text-left">
-                  <span @click="openFolder(item)" class="info--text">
+                  <a
+                    @click="openFolder(item, true)"
+                    class="info--text text-decoration-none"
+                    href="#"
+                  >
                     {{ item.name }}
-                  </span>
+                  </a>
                 </td>
-                <td class="text-left">{{ item.calories }}</td>
+                <td class="text-left">{{ item.size }}</td>
                 <td class="text-right">
                   <v-btn
                     small
@@ -44,26 +56,34 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   data() {
     return {
       items: Array
     };
   },
+  computed: {
+    ...mapGetters({ currentPath: "getCurrentPath" }),
+    breadItems() {
+      return this.currentPath.split("/").map((e) => {
+        return {
+          text: e,
+          href: "",
+          disabled: false
+        };
+      });
+    }
+  },
   methods: {
     async fetchData() {
-      try {
-        const response = await this.$http({
-          url: "/api/v1/files"
-        });
-        this.items = response.data.data;
-      } catch (error) {
-        console.log(error);
-      }
+      this.openFolder({ name: "/home" }, false);
     },
     async download(item) {
       const data = {
-        fileName: item["name"]
+        fileName: item["name"],
+        path: this.currentPath
       };
 
       try {
@@ -76,12 +96,21 @@ export default {
         console.log(error);
       }
     },
-    async openFolder(item) {
+    async openFolder(item, navigate) {
+      let path =
+        ((!this.currentPath || !navigate) && `${item.name}`) ||
+        `${this.currentPath}/${item.name}`;
+
       try {
         const response = await this.$http({
-          url: `/api/v1/folders/${item.name}`
+          method: "post",
+          url: `/api/v1/list/files`,
+          data: {
+            path
+          }
         });
         this.items = response.data.data;
+        this.$store.commit("setCurrentPath", path);
       } catch (error) {
         console.log(error);
       }

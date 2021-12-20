@@ -1,7 +1,11 @@
 {
-  "name": "vue-desktop",
-  "version": "0.1.0",
+  "name": "coffe-sync",
+  "version": "1.0.0",
   "private": true,
+  "author": "Mario Diaz",
+  "description": "This is a program designed to make your daily work life as a developer happier. Transfer data from dev, stag or prod boxes to your machine easily and secure.",
+  "appId": "com.coffesync.app",
+  "productName": "CoffeSync",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -15,6 +19,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
     "lodash": "^4.17.21",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
@@ -29,6 +34,7 @@
     "babel-eslint": "^10.1.0",
     "electron": "^13.0.0",
     "electron-devtools-installer": "^3.1.0",
+    "electron-packager": "^15.4.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "sass": "~1.32.0",

@@ -1,11 +1,35 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, Menu  } from "electron";
+import { app, protocol, BrowserWindow, Menu } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-const isMac = process.platform === 'darwin'
+const isMac = process.platform === "darwin";
+
+// express
+let express = require("express");
+const cors = require("cors");
+
+const { routes } = require("../server/src/routes");
+
+let app2 = express();
+app2.use(cors());
+app2.use(express.json());
+app2.use(
+  express.urlencoded({
+    extended: true
+  })
+);
+
+// app routes
+routes(app2);
+
+let server = app2.listen(3020, function () {
+  let host = server.address().address;
+  let port = server.address().port;
+  console.log("App Listening at http://%s:%s", host, port);
+});
 
 // Menu.setApplicationMenu(null)
 // Scheme must be registered before the app is ready
@@ -19,7 +43,8 @@ async function createWindow() {
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    titleBarStyle: 'default',
+    titleBarStyle: "default",
+    title: "Coffe Sync",
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
