@@ -1,6 +1,12 @@
 "use strict";
 
-import { app, protocol, BrowserWindow, Menu } from "electron";
+import {
+  app,
+  protocol,
+  BrowserWindow,
+  ipcMain,
+  systemPreferences
+} from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 
@@ -30,6 +36,7 @@ let server = app2.listen(3020, function () {
   let port = server.address().port;
   console.log("App Listening at http://%s:%s", host, port);
 });
+// express
 
 // Menu.setApplicationMenu(null)
 // Scheme must be registered before the app is ready
@@ -40,10 +47,10 @@ protocol.registerSchemesAsPrivileged([
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1150,
+    height: 680,
     autoHideMenuBar: true,
-    titleBarStyle: "default",
+    titleBarStyle: "hidden",
     title: "Coffe Sync",
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -65,6 +72,23 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL("app://./index.html");
   }
+
+  ipcMain.on("resizeWindow", (event, data) => {
+    const doubleClickAction = systemPreferences.getUserDefault(
+      "AppleActionOnDoubleClick",
+      "string"
+    );
+
+    if (doubleClickAction === "Minimize") {
+      win.minimize();
+    } else if (doubleClickAction === "Maximize") {
+      if (!win.isMaximized()) {
+        win.maximize();
+      } else {
+        win.unmaximize();
+      }
+    }
+  });
 }
 
 // Quit when all windows are closed.

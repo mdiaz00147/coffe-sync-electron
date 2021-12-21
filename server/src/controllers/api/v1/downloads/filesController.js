@@ -3,9 +3,10 @@ const { exec } = require("child_process");
 exports.create = async (req, res) => {
   const fileName = req.body["fileName"];
   const pathName = req.body["path"];
+  const hostIP = req.body["host"];
 
   console.log("DEBUG::", fileName);
-  let command = `rsync -azP root@104.207.133.53:${pathName}/${fileName} /Users/$(whoami)/Downloads`;
+  let command = `rsync -azP root@${hostIP}:${pathName}/${fileName} /Users/$(whoami)/Downloads`;
 
   const call = await exec(command);
 

@@ -20,17 +20,17 @@ export const store = new Vuex.Store({
   plugins: [vuexLocalStorage.plugin],
   state: {
     currentPath: "",
-    authToken: null,
+    host: "",
+    folderItems: [],
     menuOpen: false,
-    isLoading: false,
-    isFetching: false
+    isLoading: false
   },
   mutations: {
     setCurrentPath(state, value) {
       state.currentPath = value;
     },
-    setAuthToken(state, token) {
-      state.authToken = token;
+    setFolderItems(state, value) {
+      state.folderItems = value;
     },
     setMenuOpen(state, open) {
       state.menuOpen = open;
@@ -38,17 +38,45 @@ export const store = new Vuex.Store({
     setLoading(state, isLoading) {
       state.isLoading = isLoading;
     },
-    setFetching(state, isFetching) {
-      state.isFetching = isFetching;
+    setHost(state, value) {
+      state.host = value;
     }
   },
   getters: {
     getCurrentPath: (state) => state.currentPath,
-    authToken: (state) => state.authToken,
+    getFolderItems: (state) => state.folderItems,
+    getHost: (state) => state.host,
     menuOpen: (state) => state.menuOpen,
-    isLoading: (state) => state.isLoading,
-    isFetching: (state) => state.isFetching,
-    uuid: (state) => state.currentUser.uuid
+    isLoading: (state) => state.isLoading
   },
-  actions: {}
+  actions: {
+    async changeHost({ commit, dispatch }, data) {
+      console.log(data);
+      await commit("setHost", data["ip"]);
+      dispatch("openFolder", { item: { name: "/home" }, navigation: false });
+    },
+    async openFolder({ getters, commit }, params) {
+      let { item, navigate } = params;
+      let path =
+        ((!this.currentPath || !navigate) && `${item.name}`) ||
+        `${this.currentPath}/${item.name}`;
+
+      const data = {
+        path: path,
+        host: getters["getHost"]
+      };
+
+      try {
+        const response = await this._vm.$http({
+          method: "post",
+          url: `/api/v1/list/files`,
+          data: data
+        });
+        commit("setFolderItems", response.data.data);
+        commit("setCurrentPath", path);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
 });

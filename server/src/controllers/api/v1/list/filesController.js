@@ -2,8 +2,9 @@ const { exec } = require("child_process");
 
 exports.create = async (req, res) => {
   const pathName = req.body["path"];
+  const hostIP = req.body["host"];
 
-  let command = `ssh root@104.207.133.53 ls -ahl ${pathName}`;
+  let command = `ssh root@${hostIP} ls -ahl ${pathName}`;
 
   const call = await exec(command);
 
@@ -13,7 +14,7 @@ exports.create = async (req, res) => {
     
     result = result.map((e) => {
       let arr = e.split(" ").filter((e) => e);
-      console.log("DEGUB::", arr);
+      // console.log("DEGUB::", arr);
 
       return {
         name: arr[arr.length - 1],
