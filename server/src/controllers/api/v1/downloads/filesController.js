@@ -1,10 +1,5 @@
 const { exec } = require("child_process");
-// const { ipcMain } = require("electron");
-// console.log(app);
-
-// setInterval(() => {
-//   ipcMain.send("download-status", "33333");
-// }, 3000);
+const axios = require("axios");
 
 exports.create = async (req, res) => {
   const fileName = req.body["fileName"];
@@ -13,14 +8,34 @@ exports.create = async (req, res) => {
   const hostPort = req.body["port"];
   const hostUsername = req.body["username"];
 
-  let command = `rsync -e 'ssh -p${hostPort}' -azP ${hostUsername}@${hostIP}:${pathName}/${fileName} /Users/$(whoami)/Downloads`;
+  let command = `rsync -e 'ssh -p${hostPort}' -azP --stats ${hostUsername}@${hostIP}:${pathName}/${fileName} /Users/$(whoami)/Downloads`;
 
   const call = await exec(command);
 
-  call.stdout.on("data", (data) => {
-    console.log(`stdout: ${data}`);
+  call.stdout.on("data", async (data) => {
+    let result = data.split(" ");
+    result = result.filter((e) => e);
+    result =
+      (result.length >= 1 &&
+        ((parseFloat(result[1].replace("%", "")) >= 100 && 100) ||
+          parseFloat(result[1].replace("%", "")))) ||
+      0;
+    console.log(`stdout: ${result}`);
+
+    try {
+      let response = await axios({
+        method: "PUT",
+        url: "https://coffesync-76027-default-rtdb.firebaseio.com/users.json",
+        data: {
+          2: {
+            progress: result
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
     // return res.status(200).send({ data: data, status: 200 });
-    // ipcMain.send("download-status", data);
   });
 
   call.stderr.once("data", (data) => {
