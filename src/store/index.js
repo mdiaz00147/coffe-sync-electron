@@ -67,6 +67,7 @@ export const store = new Vuex.Store({
       dispatch("openFolder", { item: { name: "/" }, navigate: false });
     },
     async openFolder({ getters, commit }, args) {
+      commit("setFolderItems", []);
       commit("setLoading", true);
       let { item, navigate } = args;
 

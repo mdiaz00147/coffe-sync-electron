@@ -13,49 +13,46 @@
         </template>
       </v-breadcrumbs>
 
-      <v-skeleton-loader
-        class="mx-auto"
-        type="table-heading, table-tbody"
-        v-if="loading"
-      ></v-skeleton-loader>
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+        class="mx-1"
+      ></v-text-field>
 
-      <v-simple-table v-else>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">Name</th>
-              <th class="text-left">Size</th>
-              <th class="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in items" :key="item.name">
-              <td class="text-left">
-                <a
-                  @click="openFolder(item, true, false)"
-                  class="info--text text-decoration-none"
-                  href="#"
-                >
-                  {{ item.name }}
-                </a>
-              </td>
-              <td class="text-left">{{ item.size }}</td>
-              <td class="text-right">
-                <v-btn
-                  small
-                  icon
-                  color="warning"
-                  elevation=""
-                  fab
-                  @click="download(item)"
-                >
-                  <v-icon> mdi-cloud-download </v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
+      <v-data-table
+        class="mt-4"
+        :headers="headers"
+        :items="items"
+        :search="search"
+        dense
+        :loading="loading"
+      >
+        <template v-slot:item.name="{ item }">
+          <a
+            @click="openFolder(item, true, false)"
+            class="info--text text-decoration-none"
+            href="#"
+          >
+            {{ item.name }}
+          </a>
         </template>
-      </v-simple-table>
+
+        <template v-slot:item.actions="{ item }">
+          <v-btn
+            small
+            icon
+            color="warning"
+            elevation=""
+            fab
+            @click="download(item)"
+          >
+            <v-icon> mdi-cloud-download </v-icon>
+          </v-btn>
+        </template>
+      </v-data-table>
     </v-col>
   </v-row>
 </template>
@@ -65,7 +62,19 @@ import { mapGetters } from "vuex";
 
 export default {
   data() {
-    return {};
+    return {
+      search: "",
+      headers: [
+        {
+          text: "Name",
+          align: "start",
+          sortable: false,
+          value: "name"
+        },
+        { text: "Size", value: "size" },
+        { text: "Actions", value: "actions", align: "end" }
+      ]
+    };
   },
   computed: {
     ...mapGetters({
