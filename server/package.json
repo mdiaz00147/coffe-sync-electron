@@ -3,6 +3,7 @@
     "axios": "^0.24.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "firebase": "^9.6.1",
     "flv.js": "^1.6.2",
     "node-media-server": "^2.3.8",
     "video.js": "^7.15.4",
