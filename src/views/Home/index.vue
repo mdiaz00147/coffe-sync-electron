@@ -1,13 +1,25 @@
 <template>
-  <v-row class="text-center">
+  <v-row>
     <v-col cols="12">
-      <v-breadcrumbs
-        divider="/"
-        :items="breadItems"
-        class="pl-0"
-      ></v-breadcrumbs>
+      <v-breadcrumbs divider="/" :items="breadItems" class="pl-0">
+        <template v-slot:item="{ item }">
+          <v-breadcrumbs-item
+            @click="openFolder(item, false, true)"
+            :href="item.href"
+            :disabled="item.disabled"
+          >
+            {{ item.text }}
+          </v-breadcrumbs-item>
+        </template>
+      </v-breadcrumbs>
 
-      <v-simple-table>
+      <v-skeleton-loader
+        class="mx-auto"
+        type="table-heading, table-tbody"
+        v-if="loading"
+      ></v-skeleton-loader>
+
+      <v-simple-table v-else>
         <template v-slot:default>
           <thead>
             <tr>
@@ -20,7 +32,7 @@
             <tr v-for="item in items" :key="item.name">
               <td class="text-left">
                 <a
-                  @click="openFolder(item, true)"
+                  @click="openFolder(item, true, false)"
                   class="info--text text-decoration-none"
                   href="#"
                 >
@@ -57,29 +69,41 @@ export default {
   },
   computed: {
     ...mapGetters({
+      items: "getFolderItems",
       currentPath: "getCurrentPath",
       host: "getHost",
-      items: "getFolderItems"
+      port: "getHostPort",
+      username: "getHostUsername",
+      loading: "getLoading"
     }),
     breadItems() {
       return this.currentPath.split("/").map((e) => {
         return {
           text: e,
-          href: "",
-          disabled: false
+          href: "#"
         };
       });
     }
   },
   methods: {
-    openFolder(item, navigate) {
+    openFolder(item, navigate, navigateBackWard = false) {
+      if (navigateBackWard) {
+        let path = this.currentPath.split("/");
+        let name = path
+          .filter((e, i) => i <= path.indexOf(item.text))
+          .join("/");
+        item["name"] = name;
+      }
+
       this.$store.dispatch("openFolder", { item, navigate });
     },
     async download(item) {
       const data = {
         fileName: item["name"],
         path: this.currentPath,
-        host: this.host
+        host: this.host,
+        port: this.port,
+        username: this.username
       };
 
       try {

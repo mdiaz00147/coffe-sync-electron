@@ -6,16 +6,12 @@
     dark
     class="top-bar"
   >
-    <v-spacer></v-spacer>
-
-    <v-btn
-      href="https://github.com/vuetifyjs/vuetify/releases/latest"
-      target="_blank"
-      text
-    >
-      <span class="mr-2">Latest Releaese</span>
-      <v-icon>mdi-open-in-new</v-icon>
+    <v-btn text>
+      <span class="mr-2">Settings</span>
+      <v-icon small>mdi-cog</v-icon>
     </v-btn>
+
+    <v-spacer></v-spacer>
 
     <div class="d-flex align-center">
       <v-img
@@ -31,6 +27,11 @@
 
 <script>
 export default {
+  created() {
+    this.$ipcRenderer.on("download-status", (data) => {
+      console.log(data);
+    });
+  },
   methods: {
     doubleClick() {
       this.$ipcRenderer.send("resizeWindow");

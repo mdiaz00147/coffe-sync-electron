@@ -20,10 +20,12 @@ export const store = new Vuex.Store({
   plugins: [vuexLocalStorage.plugin],
   state: {
     currentPath: "",
-    host: "",
     folderItems: [],
-    menuOpen: false,
-    isLoading: false
+    host: "",
+    hostPort: "",
+    hostUsername: "",
+    loading: false,
+    serversList: []
   },
   mutations: {
     setCurrentPath(state, value) {
@@ -32,38 +34,53 @@ export const store = new Vuex.Store({
     setFolderItems(state, value) {
       state.folderItems = value;
     },
-    setMenuOpen(state, open) {
-      state.menuOpen = open;
-    },
-    setLoading(state, isLoading) {
-      state.isLoading = isLoading;
-    },
     setHost(state, value) {
       state.host = value;
+    },
+    setHostPort(state, vaue) {
+      state.hostPort = vaue;
+    },
+    setHostUsername(state, vaue) {
+      state.hostUsername = vaue;
+    },
+    setLoading(state, value) {
+      state.loading = value;
+    },
+    setServersList(state, value) {
+      state.serversList = value;
     }
   },
   getters: {
     getCurrentPath: (state) => state.currentPath,
     getFolderItems: (state) => state.folderItems,
     getHost: (state) => state.host,
-    menuOpen: (state) => state.menuOpen,
-    isLoading: (state) => state.isLoading
+    getHostPort: (state) => state.hostPort,
+    getHostUsername: (state) => state.hostUsername,
+    getLoading: (state) => state.loading,
+    getServersList: (state) => state.serversList
   },
   actions: {
     async changeHost({ commit, dispatch }, data) {
-      console.log(data);
-      await commit("setHost", data["ip"]);
-      dispatch("openFolder", { item: { name: "/home" }, navigation: false });
+      await commit("setHost", data["host"]);
+      await commit("setHostPort", data["port"]);
+      await commit("setHostUsername", data["username"]);
+      dispatch("openFolder", { item: { name: "/" }, navigate: false });
     },
-    async openFolder({ getters, commit }, params) {
-      let { item, navigate } = params;
-      let path =
-        ((!this.currentPath || !navigate) && `${item.name}`) ||
-        `${this.currentPath}/${item.name}`;
+    async openFolder({ getters, commit }, args) {
+      commit("setLoading", true);
+      let { item, navigate } = args;
 
+      let path =
+        ((!getters["getCurrentPath"] || !navigate) && `${item.name}`) ||
+        (getters["getCurrentPath"] === "/" && `/${item.name}`) ||
+        `${getters["getCurrentPath"]}/${item.name}`;
+
+      console.log("DEGUG-item::", item);
       const data = {
         path: path,
-        host: getters["getHost"]
+        host: getters["getHost"],
+        username: getters["getHostUsername"],
+        port: getters["getHostPort"]
       };
 
       try {
@@ -74,7 +91,9 @@ export const store = new Vuex.Store({
         });
         commit("setFolderItems", response.data.data);
         commit("setCurrentPath", path);
+        commit("setLoading", false);
       } catch (error) {
+        commit("setLoading", false);
         console.log(error);
       }
     }

@@ -11,6 +11,7 @@ import DefaultRouterContainer from "@/layout/DefaultRouterContainer.vue";
 
 // Admin pages
 import Home from "@/views/Home";
+import ServersAdd from "@/views/Servers/Add";
 
 // auth
 // const Login = () => import("@/pages/Auth/Login");
@@ -21,41 +22,19 @@ Vue.use(Router);
 
 const router = new Router({
   mode: "hash", // https://router.vuejs.org/api/#mode
-  linkActiveClass: "has-active",
   scrollBehavior: () => ({ y: 0 }),
 
   routes: [
     {
+      name: "Home",
       path: "/",
-      component: Home,
+      component: Home
     },
-    // {
-    //   path: "/",
-    //   redirect: "login",
-    //   component: AuthLayout,
-    //   children: [
-    //     {
-    //       path: "login",
-    //       name: "Login",
-    //       component: Login
-    //     },
-    //     {
-    //       path: "register",
-    //       name: "Register",
-    //       component: Register
-    //     },
-    //     {
-    //       path: "/register/upline/:sponsor",
-    //       name: "RegisterLink",
-    //       component: Register
-    //     },
-    //     {
-    //       path: "recovery",
-    //       name: "Recovery",
-    //       component: Forgot
-    //     }
-    //   ]
-    // },
+    {
+      name: "ServersAdd",
+      path: "/",
+      component: ServersAdd
+    },
     {
       path: "*",
       redirect: "login"
